@@ -8,7 +8,6 @@ export class Game {
     this.currentPlayer = this.player1; // Player 1 starts the game
   }
 
-  // Method to switch turns
   switchTurn() {
     if (this.currentPlayer === this.player1) {
       this.currentPlayer = this.player2;
