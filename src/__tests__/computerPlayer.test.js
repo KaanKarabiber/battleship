@@ -12,25 +12,35 @@ describe('ComputerPlayer class', () => {
     expect(computerPlayer).toBeInstanceOf(Player);
   });
 
-  test('should generate random coordinates for placing ships', () => {
-    const coordinates = computerPlayer.generateRandomCoordinates();
+  test('should generate valid random coordinates for all ship lengths', () => {
+    computerPlayer.shipLengths.forEach((shipLength) => {
+      const coordinates = computerPlayer.generateRandomCoordinates(shipLength);
 
-    expect(Array.isArray(coordinates)).toBe(true);
+      // Check that coordinates is an array
+      expect(Array.isArray(coordinates)).toBe(true);
 
-    expect(coordinates.length).toBeGreaterThanOrEqual(2);
-    expect(coordinates.length).toBeLessThanOrEqual(4);
+      // Ensure the correct number of coordinates is generated
+      expect(coordinates.length).toBe(shipLength);
 
-    coordinates.forEach((coord) => {
-      expect(coord).toHaveLength(2);
-      expect(typeof coord[0]).toBe('number');
-      expect(typeof coord[1]).toBe('number');
+      coordinates.forEach(([x, y]) => {
+        expect(typeof x).toBe('number');
+        expect(typeof y).toBe('number');
+        expect(x).toBeGreaterThanOrEqual(0);
+        expect(x).toBeLessThan(10);
+        expect(y).toBeGreaterThanOrEqual(0);
+        expect(y).toBeLessThan(10);
+      });
+
+      expect(computerPlayer.gameboard.isValidPlacement(coordinates)).toBe(true);
     });
   });
 
   test('should be able to place a ship at random coordinates', () => {
-    const coordinates = computerPlayer.generateRandomCoordinates();
-    const ship = computerPlayer.placeShip(coordinates);
-    expect(ship).toBeDefined();
+    // Call placeShip, which internally generates random coordinates
+    computerPlayer.placeShip();
+
+    // Check if a ship is placed on the gameboard
+    expect(computerPlayer.gameboard.ships.length).toBeGreaterThan(0); // Ensure at least one ship is placed
   });
 
   test('should attack randomly', () => {

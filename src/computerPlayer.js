@@ -1,24 +1,42 @@
 import { Player } from './player.js';
 
 export class ComputerPlayer extends Player {
-  constructor(name) {
-    super(name);
+  constructor() {
+    super('Computer');
   }
   placeShip() {
-    const randomCoordinates = this.generateRandomCoordinates();
-    return super.placeShip(randomCoordinates);
+    this.shipLengths.forEach((length) => {
+      const coordinates = this.generateRandomCoordinates(length);
+      super.placeShip(coordinates);
+    });
   }
-  generateRandomCoordinates() {
-    let coordinates = [];
-    const x = Math.floor(Math.random() * 10);
-    const y = Math.floor(Math.random() * 10);
-    coordinates.push([x, y]);
 
-    // Add a few more coordinates to form a ship (random length between 2 and 4)
-    const length = Math.floor(Math.random() * 3) + 2;
-    for (let i = 1; i < length; i++) {
-      coordinates.push([x + i, y]); // Horizontally place the ship (could be improved)
-    }
+  generateRandomCoordinates(length) {
+    let coordinates;
+    const isHorizontal = Math.random() < 0.5; // Randomly decide direction
+    let x, y;
+
+    do {
+      coordinates = [];
+      x = Math.floor(Math.random() * 10);
+      y = Math.floor(Math.random() * 10);
+
+      for (let i = 0; i < length; i++) {
+        let newX = isHorizontal ? x + i : x;
+        let newY = isHorizontal ? y : y + i;
+
+        // Ensure it stays within the board
+        if (newX >= 10 || newY >= 10) {
+          coordinates = [];
+          break; // Restart if out of bounds
+        }
+
+        coordinates.push([newX, newY]);
+      }
+    } while (
+      coordinates.length !== length ||
+      !this.gameboard.isValidPlacement(coordinates)
+    );
 
     return coordinates;
   }
