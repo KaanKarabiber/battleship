@@ -5,6 +5,7 @@ export class Player {
     this.name = name;
     this.gameboard = new Gameboard();
     this.opponent = null;
+    this.shipLengths = [5, 4, 3, 3, 2];
   }
   setOpponent(opponent) {
     this.opponent = opponent;
@@ -19,5 +20,8 @@ export class Player {
   }
   hasShipsLeft() {
     return !this.gameboard.allShipsSunk();
+  }
+  areAllShipsPlaced() {
+    return this.gameboard.ships.length === this.shipLengths.length;
   }
 }
