@@ -7,8 +7,8 @@ const createUI = {
     player1Grid.id = 'player-1-grid';
 
     const player2Grid = document.createElement('div');
-    player2Grid.id = 'player-2-grid';
     player2Grid.classList.add('board');
+    player2Grid.id = 'player-2-grid';
 
     const content = document.querySelector('.content');
     content.append(player1Grid, player2Grid);
