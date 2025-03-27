@@ -55,3 +55,9 @@ describe('Gameboard functionality', () => {
     expect(gameboard.allShipsSunk()).toBe(true);
   });
 });
+test('cant place a ship where there is already a ship', () => {
+  let gameboard = new Gameboard();
+  gameboard.placeShip([[0, 0]]);
+  gameboard.placeShip([[0, 0]]);
+  expect(gameboard.ships.length).toBe(1);
+});
