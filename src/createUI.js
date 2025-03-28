@@ -1,5 +1,3 @@
-// import { Game } from './game.js';
-
 const createUI = {
   createDivs() {
     const player1Grid = document.createElement('div');
@@ -14,7 +12,7 @@ const createUI = {
     content.append(player1Grid, player2Grid);
     return [player1Grid, player2Grid];
   },
-  createBoard(playerBoard, player) {
+  createBoard(playerBoard, player, game) {
     player.gameboard.board.forEach((row, rowIndex) => {
       row.forEach((_, colIndex) => {
         const cell = document.createElement('button');
@@ -23,13 +21,33 @@ const createUI = {
 
         cell.dataset.row = rowIndex;
         cell.dataset.col = colIndex;
+        if (player === game.player2) {
+          cell.addEventListener('click', () => {
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
 
-        cell.addEventListener('click', () => {
-          const row = parseInt(cell.dataset.row);
-          const col = parseInt(cell.dataset.col);
-
-          console.log(`Cell clicked at coordinates: (${row}, ${col})`);
-        });
+            const attemptedShot =
+              game.currentPlayer.opponent.gameboard.receivedShots.find(
+                (s) => s.coordinates[0] === row && s.coordinates[1] === col
+              );
+            if (attemptedShot) {
+              console.log(
+                `Already shot at (${row}, ${col}) - it was a ${attemptedShot.hit ? 'hit' : 'miss'}`
+              );
+              return;
+            }
+            game.playTurn([row, col]);
+            const validShot =
+              game.currentPlayer.opponent.gameboard.receivedShots.find(
+                (s) => s.coordinates[0] === row && s.coordinates[1] === col
+              );
+            if (validShot) {
+              cell.classList.add('hit');
+            } else {
+              cell.classList.add('miss');
+            }
+          });
+        }
       });
     });
   },
