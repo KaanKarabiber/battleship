@@ -24,11 +24,11 @@ export class Gameboard {
     );
   }
   receiveAttack([x, y]) {
-    if (this.board[x][y] instanceof Ship) {
+    const hit = this.board[x][y] instanceof Ship;
+    if (hit) {
       this.board[x][y].hit();
-    } else {
-      this.receivedShots.push([x, y]);
     }
+    this.receivedShots.push({ coordinates: [x, y], hit });
   }
   allShipsSunk() {
     return this.ships.every((ship) => ship.isSunk());
