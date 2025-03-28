@@ -7,6 +7,8 @@ describe('Game class', () => {
 
   beforeEach(() => {
     game = new Game();
+    game.player1.opponent = game.player2;
+    game.player2.opponent = game.player1;
   });
 
   test('should initialize with Player 1 and Computer as players', () => {
