@@ -18,7 +18,35 @@ export class Game {
 
   playTurn(coordinates) {
     this.currentPlayer.attack(coordinates);
+    const [x, y] = coordinates;
+    const shot = this.currentPlayer.opponent.gameboard.receivedShots.find(
+      (s) => s.coordinates[0] === x && s.coordinates[1] === y
+    );
+    // if the attack is a hit don't switch turns
+    if (shot && shot.hit) {
+      return;
+    }
     this.switchTurn();
+    if (this.currentPlayer.name === 'Computer') {
+      let coordinates;
+      let x, y;
+      do {
+        coordinates = this.currentPlayer.attack();
+        [x, y] = coordinates;
+        console.log(coordinates);
+      } while (
+        this.currentPlayer.opponent.gameboard.receivedShots.find(
+          (s) =>
+            s.coordinates[0] === x &&
+            s.coordinates[1] === y &&
+            this.currentPlayer.opponent.gameboard.receivedShots.find(
+              (s) => s.coordinates[0] === x && s.coordinates[1] === y
+            ).hit
+        )
+      );
+
+      this.switchTurn();
+    }
   }
   isGameOver() {
     return !this.player1.hasShipsLeft() || !this.player2.hasShipsLeft();
