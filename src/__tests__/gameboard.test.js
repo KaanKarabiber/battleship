@@ -46,7 +46,7 @@ describe('Gameboard functionality', () => {
     gameboard.receiveAttack([0, 0]);
     gameboard.receiveAttack([0, 5]);
     expect(gameboard.board[0][0].hits).toBe(1);
-    expect(gameboard.receivedShots.length).toBe(1);
+    expect(gameboard.receivedShots.length).toBe(2);
   });
   test('can it detect all ships sunk', () => {
     gameboard.receiveAttack([0, 0]);
