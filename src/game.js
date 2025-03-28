@@ -1,5 +1,6 @@
 import { Player } from './player.js';
 import { ComputerPlayer } from './computerPlayer.js';
+import createUI from './createUI.js';
 
 export class Game {
   constructor() {
@@ -33,7 +34,7 @@ export class Game {
       do {
         coordinates = this.currentPlayer.attack();
         [x, y] = coordinates;
-        console.log(coordinates);
+        createUI.addClass(coordinates, this.player1);
       } while (
         this.currentPlayer.opponent.gameboard.receivedShots.find(
           (s) =>
