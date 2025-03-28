@@ -4,6 +4,7 @@ export class ComputerPlayer extends Player {
   constructor() {
     super('Computer');
   }
+  //places all ships
   placeShip() {
     this.shipLengths.forEach((length) => {
       const coordinates = this.generateRandomCoordinates(length);
@@ -41,8 +42,23 @@ export class ComputerPlayer extends Player {
     return coordinates;
   }
   attack() {
-    const x = Math.floor(Math.random() * 10);
-    const y = Math.floor(Math.random() * 10);
+    let x, y;
+    let validAttack = false;
+
+    while (!validAttack) {
+      x = Math.floor(Math.random() * 10);
+      y = Math.floor(Math.random() * 10);
+
+      // Check if the computer has already attacked this spot
+      const attemptedShot = this.gameboard.receivedShots.find(
+        (s) => s.coordinates[0] === x && s.coordinates[1] === y
+      );
+
+      if (!attemptedShot) {
+        validAttack = true;
+      }
+    }
     super.attack([x, y]);
+    return [x, y];
   }
 }
