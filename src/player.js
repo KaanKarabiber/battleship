@@ -7,6 +7,9 @@ export class Player {
     this.opponent = null;
     this.shipLengths = [5, 4, 3, 3, 2];
   }
+  setName(name) {
+    this.name = name;
+  }
   setOpponent(opponent) {
     this.opponent = opponent;
   }
