@@ -52,6 +52,9 @@ const createUI = {
     });
   },
   renderShips(game) {
+    document.querySelectorAll('.ship').forEach((element) => {
+      element.classList.remove('ship');
+    });
     game.player1.gameboard.board.forEach((row, rowIndex) => {
       row.forEach((cell, colIndex) => {
         if (cell != null) {
@@ -71,6 +74,24 @@ const createUI = {
       (s) => s.coordinates[0] === x && s.coordinates[1] === y
     );
     if (shot) cell.classList.add(shot.hit ? 'hit' : 'miss');
+  },
+  addUtilityButtons(game) {
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'RESET';
+
+    const randomizeButton = document.createElement('button');
+    randomizeButton.textContent = 'RANDOMIZE';
+
+    randomizeButton.addEventListener('click', () => {
+      game.player1.gameboard.resetBoard();
+      game.player1.placeShipsRandomly();
+      this.renderShips(game);
+    });
+
+    const buttonDivs = document.createElement('div');
+    buttonDivs.append(resetButton, randomizeButton);
+    const content = document.querySelector('.content');
+    content.append(buttonDivs);
   },
 };
 export default createUI;
