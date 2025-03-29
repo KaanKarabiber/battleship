@@ -3,9 +3,13 @@ import { Player } from '../player.js';
 
 describe('ComputerPlayer class', () => {
   let computerPlayer;
+  let computerPlayer2;
 
   beforeEach(() => {
     computerPlayer = new ComputerPlayer('Computer');
+    computerPlayer2 = new ComputerPlayer('Computer2');
+
+    computerPlayer.setOpponent(computerPlayer2);
   });
 
   test('should inherit from Player', () => {
@@ -37,7 +41,7 @@ describe('ComputerPlayer class', () => {
 
   test('should be able to place a ship at random coordinates', () => {
     // Call placeShip, which internally generates random coordinates
-    computerPlayer.placeShip();
+    computerPlayer.placeShipsRandomly();
 
     // Check if a ship is placed on the gameboard
     expect(computerPlayer.gameboard.ships.length).toBeGreaterThan(0); // Ensure at least one ship is placed

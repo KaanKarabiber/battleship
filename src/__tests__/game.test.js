@@ -31,7 +31,7 @@ describe('Game class', () => {
 
   test('should check if the game is over', () => {
     game.player1.placeShip([[0, 5]]);
-    game.player2.placeShip();
+    game.player2.placeShipsRandomly();
     const gameOver = game.isGameOver();
     expect(gameOver).toBe(false);
   });
