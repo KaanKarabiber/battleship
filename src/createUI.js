@@ -70,7 +70,6 @@ const createUI = {
     const shot = player.gameboard.receivedShots.find(
       (s) => s.coordinates[0] === x && s.coordinates[1] === y
     );
-    console.log(player.gameboard.receivedShots);
     if (shot) cell.classList.add(shot.hit ? 'hit' : 'miss');
   },
 };
