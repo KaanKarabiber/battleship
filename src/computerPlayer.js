@@ -50,7 +50,7 @@ export class ComputerPlayer extends Player {
       y = Math.floor(Math.random() * 10);
 
       // Check if the computer has already attacked this spot
-      const attemptedShot = this.gameboard.receivedShots.find(
+      const attemptedShot = this.opponent.gameboard.receivedShots.find(
         (s) => s.coordinates[0] === x && s.coordinates[1] === y
       );
 
