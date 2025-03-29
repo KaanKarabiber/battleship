@@ -33,4 +33,11 @@ export class Gameboard {
   allShipsSunk() {
     return this.ships.every((ship) => ship.isSunk());
   }
+  resetBoard() {
+    this.board = Array(10)
+      .fill(null)
+      .map(() => Array(10).fill(null));
+    this.receivedShots = [];
+    this.ships = [];
+  }
 }
