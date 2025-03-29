@@ -19,6 +19,7 @@ export class Game {
 
   playTurn(coordinates) {
     this.currentPlayer.attack(coordinates);
+    if (this.isGameOver()) console.log('end');
     const [x, y] = coordinates;
     const shot = this.currentPlayer.opponent.gameboard.receivedShots.find(
       (s) => s.coordinates[0] === x && s.coordinates[1] === y
@@ -33,6 +34,7 @@ export class Game {
       let x, y;
       do {
         coordinates = this.currentPlayer.attack();
+        if (this.isGameOver()) console.log('end');
         [x, y] = coordinates;
         createUI.addClass(coordinates, this.player1);
       } while (
