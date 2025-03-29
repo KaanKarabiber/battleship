@@ -75,6 +75,7 @@ const createUI = {
     );
     if (shot) cell.classList.add(shot.hit ? 'hit' : 'miss');
   },
+  // add a logic to disable randomize if a game started
   addUtilityButtons(game) {
     const resetButton = document.createElement('button');
     resetButton.textContent = 'RESET';
