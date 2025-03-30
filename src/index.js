@@ -1,14 +1,25 @@
 import './styles.css';
 import { Game } from './game.js';
-import createUI from './createUI.js';
+// import createUI from './createUI.js';
 
-const game = new Game();
-game.player1.setOpponent(game.player2);
-game.player2.setOpponent(game.player1);
-game.player1.placeShipsRandomly();
-game.player2.placeShipsRandomly();
-const boards = createUI.createDivs();
-createUI.createBoard(boards[0], game.player1, game);
-createUI.createBoard(boards[1], game.player2, game);
-createUI.renderShips(game);
-createUI.addUtilityButtons(game);
+const modal = document.querySelector('#name-modal');
+const submitButton = document.querySelector('#submit-name');
+const inputField = document.querySelector('#player-name');
+function openModal() {
+  modal.style.display = 'block';
+}
+
+function closeModal() {
+  modal.style.display = 'none';
+}
+
+openModal();
+submitButton.addEventListener('click', () => {
+  const playerName = inputField.value.trim();
+  const game = new Game();
+  game.startGame(game, playerName);
+  closeModal();
+});
+
+// const game = new Game();
+// game.startGame(game, 'xd');
