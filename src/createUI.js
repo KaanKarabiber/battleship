@@ -12,7 +12,24 @@ const createUI = {
     content.append(player1Grid, player2Grid);
     return [player1Grid, player2Grid];
   },
-  createBoard(playerBoard, player, game) {
+
+  disableButtons() {
+    if (typeof document === 'undefined') return;
+    const compBoardDiv = document.querySelector('#player-2-grid');
+    const buttons = compBoardDiv.querySelectorAll('button');
+    buttons.forEach((button) => {
+      button.disabled = true;
+    });
+  },
+  enableButtons() {
+    if (typeof document === 'undefined') return;
+    const compBoardDiv = document.querySelector('#player-2-grid');
+    const buttons = compBoardDiv.querySelectorAll('button');
+    buttons.forEach((button) => {
+      button.disabled = false;
+    });
+  },
+  async createBoard(playerBoard, player, game) {
     player.gameboard.board.forEach((row, rowIndex) => {
       row.forEach((_, colIndex) => {
         const cell = document.createElement('button');
@@ -22,7 +39,8 @@ const createUI = {
         cell.dataset.row = rowIndex;
         cell.dataset.col = colIndex;
         if (player === game.player2) {
-          cell.addEventListener('click', () => {
+          cell.addEventListener('click', async () => {
+            createUI.disableButtons();
             const row = parseInt(cell.dataset.row);
             const col = parseInt(cell.dataset.col);
 
@@ -30,26 +48,32 @@ const createUI = {
               game.currentPlayer.opponent.gameboard.receivedShots.find(
                 (s) => s.coordinates[0] === row && s.coordinates[1] === col
               );
+
             if (attemptedShot) {
               console.log(
                 `Already shot at (${row}, ${col}) - it was a ${attemptedShot.hit ? 'hit' : 'miss'}`
               );
+              createUI.enableButtons();
               return;
             }
-            game.playTurn([row, col]);
-            const validShot =
-              game.currentPlayer.opponent.gameboard.receivedShots.find(
-                (s) => s.coordinates[0] === row && s.coordinates[1] === col
-              );
-            if (validShot.hit) {
-              cell.classList.add('hit');
-            } else {
-              cell.classList.add('miss');
-            }
+
+            await game.playTurn([row, col]);
+            createUI.enableButtons();
           });
         }
       });
     });
+  },
+  addHitOrMissClass(playerShot) {
+    const [x, y] = playerShot.coordinates;
+    const cell = document.querySelector(
+      `#player-2-grid [data-row="${x}"][data-col="${y}"]`
+    );
+    if (playerShot && playerShot.hit) {
+      cell.classList.add('hit');
+    } else {
+      cell.classList.add('miss');
+    }
   },
   renderShips(game) {
     document.querySelectorAll('.ship').forEach((element) => {
@@ -77,8 +101,8 @@ const createUI = {
   },
   // add a logic to disable randomize if a game started
   addUtilityButtons(game) {
-    const resetButton = document.createElement('button');
-    resetButton.textContent = 'RESET';
+    const restartButton = document.createElement('button');
+    restartButton.textContent = 'RESTART';
 
     const randomizeButton = document.createElement('button');
     randomizeButton.textContent = 'RANDOMIZE';
@@ -90,7 +114,7 @@ const createUI = {
     });
 
     const buttonDivs = document.createElement('div');
-    buttonDivs.append(resetButton, randomizeButton);
+    buttonDivs.append(restartButton, randomizeButton);
     const content = document.querySelector('.content');
     content.append(buttonDivs);
   },
