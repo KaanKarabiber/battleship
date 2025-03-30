@@ -58,13 +58,14 @@ const createUI = {
             }
 
             await game.playTurn([row, col]);
-            createUI.enableButtons();
+            if (!game.isGameOver()) createUI.enableButtons();
           });
         }
       });
     });
   },
   addHitOrMissClass(playerShot) {
+    if (typeof document === 'undefined') return;
     const [x, y] = playerShot.coordinates;
     const cell = document.querySelector(
       `#player-2-grid [data-row="${x}"][data-col="${y}"]`
@@ -103,7 +104,9 @@ const createUI = {
   addUtilityButtons(game) {
     const restartButton = document.createElement('button');
     restartButton.textContent = 'RESTART';
-
+    restartButton.addEventListener('click', () => {
+      game.restartGame(game);
+    });
     const randomizeButton = document.createElement('button');
     randomizeButton.textContent = 'RANDOMIZE';
 
