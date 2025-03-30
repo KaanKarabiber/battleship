@@ -40,7 +40,6 @@ export class ComputerPlayer extends Player {
       this.queueAdjacentShots(x, y); // Queue adjacent squares for next attack
     }
 
-    console.log(this.targetQueue);
     return [x, y];
   }
   queueAdjacentShots(x, y) {
