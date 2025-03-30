@@ -22,15 +22,16 @@ export class Game {
 
   async playTurn(coordinates) {
     this.currentPlayer.attack(coordinates);
-    if (this.isGameOver()) {
-      createUI.disableButtons();
-      return;
-    }
-
     const [x, y] = coordinates;
     const playerShot = this.currentPlayer.opponent.gameboard.receivedShots.find(
       (s) => s.coordinates[0] === x && s.coordinates[1] === y
     );
+    if (this.isGameOver()) {
+      createUI.addHitOrMissClass(playerShot);
+      createUI.disableButtons();
+      return;
+    }
+
     createUI.addHitOrMissClass(playerShot);
 
     if (!playerShot || !playerShot.hit) {
@@ -74,5 +75,33 @@ export class Game {
 
   isGameOver() {
     return !this.player1.hasShipsLeft() || !this.player2.hasShipsLeft();
+  }
+  startGame(game, player1Name) {
+    game.player1.name = player1Name;
+    game.player1.setOpponent(game.player2);
+    game.player2.setOpponent(game.player1);
+    game.player1.placeShipsRandomly();
+    game.player2.placeShipsRandomly();
+    const boards = createUI.createDivs();
+    createUI.createBoard(boards[0], game.player1, game);
+    createUI.createBoard(boards[1], game.player2, game);
+    createUI.renderShips(game);
+    createUI.addUtilityButtons(game);
+  }
+  restartGame(game) {
+    const cells = document.querySelectorAll('.grid-cell');
+    cells.forEach((cell) => {
+      const classes = Array.from(cell.classList);
+      classes.forEach((cls) => {
+        if (cls !== 'grid-cell') {
+          cell.classList.remove(cls);
+        }
+      });
+    });
+    game.player1.gameboard.resetBoard();
+    game.player2.gameboard.resetBoard();
+    game.player1.placeShipsRandomly();
+    game.player2.placeShipsRandomly();
+    createUI.renderShips(game);
   }
 }
