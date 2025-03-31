@@ -96,6 +96,7 @@ export class Game {
         if (cls !== 'grid-cell') {
           cell.classList.remove(cls);
         }
+        createUI.enableButtons();
       });
     });
     game.player1.gameboard.resetBoard();
