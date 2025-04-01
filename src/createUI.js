@@ -1,4 +1,5 @@
 let currentDraggedShipId = null;
+let currentDragOrientation = 'vertical';
 const createUI = {
   createDivs() {
     const player1Grid = document.createElement('div');
@@ -11,6 +12,7 @@ const createUI = {
 
     const content = document.querySelector('.content');
     content.append(player1Grid, player2Grid);
+    document.addEventListener('keydown', createUI.handleRightClickDuringDrag);
     return [player1Grid, player2Grid];
   },
 
@@ -252,6 +254,16 @@ const createUI = {
     document.querySelectorAll('.grid-cell.highlight').forEach((cell) => {
       cell.classList.remove('highlight');
     });
+  },
+  handleRightClickDuringDrag(event) {
+    if (
+      (event.key === 'r' || event.key === 'R') &&
+      currentDraggedShipId !== null
+    ) {
+      event.preventDefault();
+      currentDragOrientation =
+        currentDragOrientation === 'vertical' ? 'horizontal' : 'vertical';
+    }
   },
   handleDrop(event, player) {
     event.preventDefault();
