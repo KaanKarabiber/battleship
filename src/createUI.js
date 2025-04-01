@@ -43,7 +43,7 @@ const createUI = {
           cell.addEventListener('dragover', createUI.handleDragOver);
           cell.addEventListener('dragleave', createUI.handleDragLeave);
           cell.addEventListener('drop', (event) =>
-            createUI.handleDrop(event, player, game)
+            createUI.handleDrop(event, player)
           );
         }
         if (player === game.player2) {
@@ -227,45 +227,109 @@ const createUI = {
     // Use the global variable for the ship ID
     const shipId = currentDraggedShipId;
 
-    if (shipId === 'ship-0') {
-      for (let index = 0; index < 5; index++) {
-        const newRow = parseInt(row) - index; // Calculate new row index
-        const cell = document.querySelector(
-          `.grid-cell[data-row="${newRow}"][data-col="${column}"]`
-        );
-        console.log(cell);
-        if (cell) {
-          cell.classList.add('highlight');
-        }
+    if (shipId === 'ship-0') createUI.highlightCells(5, row, column);
+
+    if (shipId === 'ship-1') createUI.highlightCells(4, row, column);
+
+    if (shipId === 'ship-2' || shipId === 'ship-3')
+      createUI.highlightCells(3, row, column);
+
+    if (shipId === 'ship-4') createUI.highlightCells(2, row, column);
+  },
+  highlightCells(length, row, column) {
+    for (let index = 0; index < length; index++) {
+      const newRow = parseInt(row) - index; // Calculate new row index
+      const cell = document.querySelector(
+        `.grid-cell[data-row="${newRow}"][data-col="${column}"]`
+      );
+      if (cell) {
+        cell.classList.add('highlight');
       }
     }
   },
-  handleDragLeave(event) {
+  handleDragLeave() {
     // Remove the highlight class from all cells
     document.querySelectorAll('.grid-cell.highlight').forEach((cell) => {
       cell.classList.remove('highlight');
     });
   },
-  handleDrop(event, player, game) {
+  handleDrop(event, player) {
     event.preventDefault();
+    let coordinates = [];
+    // Get the ship ID from dataTransfer or fallback to the global variable
+    const shipId =
+      event.dataTransfer.getData('text/plain') || currentDraggedShipId;
+    if (!shipId) return;
 
-    const shipId = event.dataTransfer.getData('text/plain');
-    const draggedShip = document.getElementById(shipId);
-
-    if (!draggedShip) return;
+    // Map ship IDs to their lengths
+    const shipLengths = {
+      'ship-0': 5,
+      'ship-1': 4,
+      'ship-2': 3,
+      'ship-3': 3,
+      'ship-4': 2,
+    };
+    const shipLength = shipLengths[shipId];
+    if (!shipLength) return;
 
     const targetCell = event.target;
-
-    // Prevent placing a ship where one already exists
-    if (targetCell.classList.contains('ship-placed')) return;
-
-    targetCell.classList.add('ship-placed');
-    targetCell.appendChild(draggedShip); // Move ship to grid
-
-    // Store ship position in player board
     const row = parseInt(targetCell.dataset.row);
     const col = parseInt(targetCell.dataset.col);
-    console.log(`Ship placed at (${row}, ${col})`);
+
+    // Check that the ship fits within the grid (vertical placement upward)
+    if (row - (shipLength - 1) < 0) {
+      console.log('Ship does not fit vertically from this drop point.');
+      return;
+    }
+
+    // Check for overlapping ships: ensure each cell in the intended placement is free
+    let validPlacement = true;
+    for (let i = 0; i < shipLength; i++) {
+      const currentRow = row - i;
+      const cell = document.querySelector(
+        `.grid-cell[data-row="${currentRow}"][data-col="${col}"]`
+      );
+      if (!cell || cell.classList.contains('ship')) {
+        validPlacement = false;
+        break;
+      }
+    }
+
+    if (!validPlacement) {
+      return;
+    }
+    // Mark each cell as having the ship placed
+    for (let i = 0; i < shipLength; i++) {
+      const currentRow = row - i;
+      const cell = document.querySelector(
+        `.grid-cell[data-row="${currentRow}"][data-col="${col}"]`
+      );
+      if (cell) {
+        cell.classList.add('ship');
+        coordinates.push([currentRow, col]);
+      }
+    }
+
+    console.log(
+      `Ship ${shipId} placed starting at (${row}, ${col}) vertically with length ${shipLength}.`
+    );
+
+    const dragShipElement = document.querySelectorAll(
+      `.draggable-ship[data-ship-id="${shipId}"]`
+    );
+    if (dragShipElement) {
+      dragShipElement.forEach((element) => {
+        for (let i = element.attributes.length - 1; i >= 0; i--) {
+          const attr = element.attributes[i];
+          if (attr.name !== 'drag-cell') {
+            element.removeAttribute(attr.name);
+          }
+        }
+      });
+    }
+    player.gameboard.placeShip(coordinates);
+    createUI.handleDragLeave(event);
+    currentDraggedShipId = null;
   },
 };
 export default createUI;
