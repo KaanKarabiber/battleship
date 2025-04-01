@@ -1,3 +1,4 @@
+let currentDraggedShipId = null;
 const createUI = {
   createDivs() {
     const player1Grid = document.createElement('div');
@@ -40,6 +41,7 @@ const createUI = {
         cell.dataset.col = colIndex;
         if (player === game.player1) {
           cell.addEventListener('dragover', createUI.handleDragOver);
+          cell.addEventListener('dragleave', createUI.handleDragLeave);
           cell.addEventListener('drop', (event) =>
             createUI.handleDrop(event, player, game)
           );
@@ -136,48 +138,48 @@ const createUI = {
       {
         length: 5,
         positions: [
+          [0, 0],
           [1, 0],
           [2, 0],
           [3, 0],
           [4, 0],
-          [5, 0],
         ],
       },
       {
         length: 4,
         positions: [
+          [6, 0],
           [7, 0],
           [8, 0],
           [9, 0],
-          [10, 0],
         ],
       },
       {
         length: 3,
         positions: [
+          [0, 2],
           [1, 2],
           [2, 2],
-          [3, 2],
         ],
       },
       {
         length: 3,
         positions: [
+          [4, 2],
           [5, 2],
           [6, 2],
-          [7, 2],
         ],
       },
       {
         length: 2,
         positions: [
+          [8, 2],
           [9, 2],
-          [10, 2],
         ],
       },
     ];
 
-    for (let x = 0; x < 12; x++) {
+    for (let x = 0; x < 10; x++) {
       for (let y = 0; y < 3; y++) {
         const cell = document.createElement('button');
         cell.classList.add('drag-cells');
@@ -210,13 +212,39 @@ const createUI = {
   handleDragStart(event) {
     let draggedShip = event.target;
     const shipId = draggedShip.getAttribute('data-ship-id');
-    event.dataTransfer.setData('text/plain', shipId);
+    currentDraggedShipId = shipId;
   },
   handleDragEnd(event) {
     event.target.style.opacity = '1';
   },
   handleDragOver(event) {
     event.preventDefault(); // Allow dropping
+    const targetCell = event.target;
+    const row = targetCell.getAttribute('data-row');
+    const column = targetCell.getAttribute('data-col');
+    console.log(row, column);
+
+    // Use the global variable for the ship ID
+    const shipId = currentDraggedShipId;
+
+    if (shipId === 'ship-0') {
+      for (let index = 0; index < 5; index++) {
+        const newRow = parseInt(row) - index; // Calculate new row index
+        const cell = document.querySelector(
+          `.grid-cell[data-row="${newRow}"][data-col="${column}"]`
+        );
+        console.log(cell);
+        if (cell) {
+          cell.classList.add('highlight');
+        }
+      }
+    }
+  },
+  handleDragLeave(event) {
+    // Remove the highlight class from all cells
+    document.querySelectorAll('.grid-cell.highlight').forEach((cell) => {
+      cell.classList.remove('highlight');
+    });
   },
   handleDrop(event, player, game) {
     event.preventDefault();
