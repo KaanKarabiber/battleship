@@ -38,6 +38,12 @@ const createUI = {
 
         cell.dataset.row = rowIndex;
         cell.dataset.col = colIndex;
+        if (player === game.player1) {
+          cell.addEventListener('dragover', createUI.handleDragOver);
+          cell.addEventListener('drop', (event) =>
+            createUI.handleDrop(event, player, game)
+          );
+        }
         if (player === game.player2) {
           cell.addEventListener('click', async () => {
             createUI.disableButtons();
@@ -120,6 +126,118 @@ const createUI = {
     buttonDivs.append(restartButton, randomizeButton);
     const content = document.querySelector('.content');
     content.append(buttonDivs);
+  },
+  createDragGrid() {
+    const content = document.querySelector('.content');
+    const dragGrid = document.createElement('div');
+    dragGrid.classList.add('drag-grid');
+
+    const shipStructures = [
+      {
+        length: 5,
+        positions: [
+          [1, 0],
+          [2, 0],
+          [3, 0],
+          [4, 0],
+          [5, 0],
+        ],
+      },
+      {
+        length: 4,
+        positions: [
+          [7, 0],
+          [8, 0],
+          [9, 0],
+          [10, 0],
+        ],
+      },
+      {
+        length: 3,
+        positions: [
+          [1, 2],
+          [2, 2],
+          [3, 2],
+        ],
+      },
+      {
+        length: 3,
+        positions: [
+          [5, 2],
+          [6, 2],
+          [7, 2],
+        ],
+      },
+      {
+        length: 2,
+        positions: [
+          [9, 2],
+          [10, 2],
+        ],
+      },
+    ];
+
+    for (let x = 0; x < 12; x++) {
+      for (let y = 0; y < 3; y++) {
+        const cell = document.createElement('button');
+        cell.classList.add('drag-cells');
+
+        let isShipCell = false;
+        let shipId = null;
+
+        shipStructures.forEach((ship, index) => {
+          ship.positions.forEach(([shipX, shipY]) => {
+            if (x === shipX && y === shipY) {
+              isShipCell = true;
+              shipId = `ship-${index}`; // Use the same ID for all parts of the ship
+            }
+          });
+        });
+
+        if (isShipCell) {
+          cell.classList.add('draggable-ship');
+          cell.dataset.shipId = shipId; // Assign the same ID for all parts of this ship
+          cell.setAttribute('draggable', 'true');
+          cell.addEventListener('dragstart', createUI.handleDragStart);
+          cell.addEventListener('dragend', createUI.handleDragEnd);
+        }
+
+        dragGrid.append(cell);
+      }
+    }
+    content.prepend(dragGrid);
+  },
+  handleDragStart(event) {
+    let draggedShip = event.target;
+    const shipId = draggedShip.getAttribute('data-ship-id');
+    event.dataTransfer.setData('text/plain', shipId);
+  },
+  handleDragEnd(event) {
+    event.target.style.opacity = '1';
+  },
+  handleDragOver(event) {
+    event.preventDefault(); // Allow dropping
+  },
+  handleDrop(event, player, game) {
+    event.preventDefault();
+
+    const shipId = event.dataTransfer.getData('text/plain');
+    const draggedShip = document.getElementById(shipId);
+
+    if (!draggedShip) return;
+
+    const targetCell = event.target;
+
+    // Prevent placing a ship where one already exists
+    if (targetCell.classList.contains('ship-placed')) return;
+
+    targetCell.classList.add('ship-placed');
+    targetCell.appendChild(draggedShip); // Move ship to grid
+
+    // Store ship position in player board
+    const row = parseInt(targetCell.dataset.row);
+    const col = parseInt(targetCell.dataset.col);
+    console.log(`Ship placed at (${row}, ${col})`);
   },
 };
 export default createUI;
