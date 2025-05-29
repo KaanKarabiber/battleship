@@ -308,6 +308,7 @@ const createUI = {
     }
 
     if (!validPlacement) {
+      createUI.handleDragLeave();
       return;
     }
     // Mark each cell as having the ship placed
