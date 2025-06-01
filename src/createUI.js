@@ -12,7 +12,6 @@ const createUI = {
 
     const content = document.querySelector('.content');
     content.append(player1Grid, player2Grid);
-    document.addEventListener('keydown', createUI.handleRightClickDuringDrag);
     return [player1Grid, player2Grid];
   },
 
@@ -125,9 +124,33 @@ const createUI = {
       game.player1.placeShipsRandomly();
       this.renderShips(game);
     });
+    const orientationButton = document.createElement('button');
+    orientationButton.textContent = 'Vertical';
+    orientationButton.addEventListener('click', () => {
+      const newOrientation =
+        orientationButton.textContent === 'Vertical'
+          ? 'horizontal'
+          : 'vertical';
+
+      // Update the button label
+      orientationButton.textContent =
+        newOrientation.charAt(0).toUpperCase() + newOrientation.slice(1);
+
+      const allShipCells = document.querySelectorAll(
+        '.drag-grid .draggable-ship'
+      );
+
+      allShipCells.forEach((cell) => {
+        cell.dataset.orientation = newOrientation;
+      });
+
+      currentDragOrientation = newOrientation;
+
+      console.log(`All ships set to ${newOrientation}`);
+    });
 
     const buttonDivs = document.createElement('div');
-    buttonDivs.append(restartButton, randomizeButton);
+    buttonDivs.append(restartButton, randomizeButton, orientationButton);
     const content = document.querySelector('.content');
     content.append(buttonDivs);
   },
@@ -200,7 +223,8 @@ const createUI = {
 
         if (isShipCell) {
           cell.classList.add('draggable-ship');
-          cell.dataset.shipId = shipId; // Assign the same ID for all parts of this ship
+          cell.dataset.shipId = shipId;
+          cell.dataset.orientation = 'vertical';
           cell.setAttribute('draggable', 'true');
           cell.addEventListener('dragstart', createUI.handleDragStart);
           cell.addEventListener('dragend', createUI.handleDragEnd);
@@ -212,9 +236,16 @@ const createUI = {
     content.prepend(dragGrid);
   },
   handleDragStart(event) {
-    let draggedShip = event.target;
-    const shipId = draggedShip.getAttribute('data-ship-id');
+    const shipId = event.target.dataset.shipId;
     currentDraggedShipId = shipId;
+    const orientation = event.target.dataset.orientation;
+    currentDragOrientation = orientation;
+
+    const dragData = {
+      shipId: shipId,
+      orientation: orientation,
+    };
+    event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
   },
   handleDragEnd(event) {
     event.target.style.opacity = '1';
@@ -224,25 +255,39 @@ const createUI = {
     const targetCell = event.target;
     const row = targetCell.getAttribute('data-row');
     const column = targetCell.getAttribute('data-col');
-    console.log(row, column);
 
-    // Use the global variable for the ship ID
-    const shipId = currentDraggedShipId;
+    const dataString = event.dataTransfer.getData('text/plain');
+    let shipId, orientation;
 
-    if (shipId === 'ship-0') createUI.highlightCells(5, row, column);
+    try {
+      const data = JSON.parse(dataString);
+      shipId = data.shipId;
+      orientation = data.orientation;
+    } catch {
+      shipId = currentDraggedShipId;
+      orientation = currentDragOrientation;
+    }
 
-    if (shipId === 'ship-1') createUI.highlightCells(4, row, column);
+    if (shipId === 'ship-0')
+      createUI.highlightCells(5, row, column, orientation);
+
+    if (shipId === 'ship-1')
+      createUI.highlightCells(4, row, column, orientation);
 
     if (shipId === 'ship-2' || shipId === 'ship-3')
-      createUI.highlightCells(3, row, column);
+      createUI.highlightCells(3, row, column, orientation);
 
-    if (shipId === 'ship-4') createUI.highlightCells(2, row, column);
+    if (shipId === 'ship-4')
+      createUI.highlightCells(2, row, column, orientation);
   },
-  highlightCells(length, row, column) {
-    for (let index = 0; index < length; index++) {
-      const newRow = parseInt(row) - index; // Calculate new row index
+  highlightCells(length, row, column, orientation) {
+    for (let i = 0; i < length; i++) {
+      const newRow =
+        orientation === 'vertical' ? parseInt(row) - i : parseInt(row);
+      const newCol =
+        orientation === 'horizontal' ? parseInt(column) + i : parseInt(column);
       const cell = document.querySelector(
-        `.grid-cell[data-row="${newRow}"][data-col="${column}"]`
+        `.grid-cell[data-row="${newRow}"][data-col="${newCol}"]`
       );
       if (cell) {
         cell.classList.add('highlight');
@@ -255,25 +300,23 @@ const createUI = {
       cell.classList.remove('highlight');
     });
   },
-  handleRightClickDuringDrag(event) {
-    if (
-      (event.key === 'r' || event.key === 'R') &&
-      currentDraggedShipId !== null
-    ) {
-      event.preventDefault();
-      currentDragOrientation =
-        currentDragOrientation === 'vertical' ? 'horizontal' : 'vertical';
-    }
-  },
   handleDrop(event, player) {
     event.preventDefault();
     let coordinates = [];
-    // Get the ship ID from dataTransfer or fallback to the global variable
-    const shipId =
-      event.dataTransfer.getData('text/plain') || currentDraggedShipId;
-    if (!shipId) return;
 
-    // Map ship IDs to their lengths
+    const dataString = event.dataTransfer.getData('text/plain');
+    let shipId, orientation;
+
+    try {
+      const data = JSON.parse(dataString);
+      shipId = data.shipId;
+      orientation = data.orientation;
+    } catch {
+      shipId = currentDraggedShipId;
+      orientation = currentDragOrientation;
+    }
+    if (!dataString) return;
+
     const shipLengths = {
       'ship-0': 5,
       'ship-1': 4,
@@ -288,18 +331,24 @@ const createUI = {
     const row = parseInt(targetCell.dataset.row);
     const col = parseInt(targetCell.dataset.col);
 
-    // Check that the ship fits within the grid (vertical placement upward)
-    if (row - (shipLength - 1) < 0) {
+    if (orientation === 'vertical' && row - (shipLength - 1) < 0) {
       console.log('Ship does not fit vertically from this drop point.');
+      createUI.handleDragLeave();
+      return;
+    }
+    if (orientation === 'horizontal' && col + (shipLength - 1) > 9) {
+      console.log('Ship does not fit horizontally from this drop point.');
+      createUI.handleDragLeave();
       return;
     }
 
-    // Check for overlapping ships: ensure each cell in the intended placement is free
     let validPlacement = true;
     for (let i = 0; i < shipLength; i++) {
-      const currentRow = row - i;
+      let currentRow = orientation === 'vertical' ? row - i : row;
+      let currentCol = orientation === 'horizontal' ? col + i : col;
+
       const cell = document.querySelector(
-        `.grid-cell[data-row="${currentRow}"][data-col="${col}"]`
+        `.grid-cell[data-row="${currentRow}"][data-col="${currentCol}"]`
       );
       if (!cell || cell.classList.contains('ship')) {
         validPlacement = false;
@@ -311,20 +360,22 @@ const createUI = {
       createUI.handleDragLeave();
       return;
     }
-    // Mark each cell as having the ship placed
+
     for (let i = 0; i < shipLength; i++) {
-      const currentRow = row - i;
+      let currentRow = orientation === 'vertical' ? row - i : row;
+      let currentCol = orientation === 'horizontal' ? col + i : col;
+
       const cell = document.querySelector(
-        `.grid-cell[data-row="${currentRow}"][data-col="${col}"]`
+        `.grid-cell[data-row="${currentRow}"][data-col="${currentCol}"]`
       );
       if (cell) {
         cell.classList.add('ship');
-        coordinates.push([currentRow, col]);
+        coordinates.push([currentRow, currentCol]);
       }
     }
 
     console.log(
-      `Ship ${shipId} placed starting at (${row}, ${col}) vertically with length ${shipLength}.`
+      `Ship ${shipId} placed starting at (${row}, ${col}) ${orientation} with length ${shipLength}.`
     );
 
     const dragShipElement = document.querySelectorAll(
