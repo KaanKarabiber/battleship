@@ -80,7 +80,6 @@ export class Game {
     game.player1.name = player1Name;
     game.player1.setOpponent(game.player2);
     game.player2.setOpponent(game.player1);
-    game.player1.placeShipsRandomly();
     game.player2.placeShipsRandomly();
     const boards = createUI.createDivs();
     createUI.createBoard(boards[0], game.player1, game);
@@ -101,7 +100,6 @@ export class Game {
     });
     game.player1.gameboard.resetBoard();
     game.player2.gameboard.resetBoard();
-    game.player1.placeShipsRandomly();
     game.player2.placeShipsRandomly();
     createUI.renderShips(game);
   }
