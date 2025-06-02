@@ -237,6 +237,14 @@ const createUI = {
   },
   handleDragStart(event) {
     const shipId = event.target.dataset.shipId;
+
+    const buttons = document.querySelectorAll(
+      `button[data-ship-id="${shipId}"]`
+    );
+    buttons.forEach((cell) => {
+      cell.style.opacity = '0.5';
+    });
+
     currentDraggedShipId = shipId;
     const orientation = event.target.dataset.orientation;
     currentDragOrientation = orientation;
@@ -248,7 +256,13 @@ const createUI = {
     event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
   },
   handleDragEnd(event) {
-    event.target.style.opacity = '1';
+    const shipId = event.target.dataset.shipId;
+    const buttons = document.querySelectorAll(
+      `button[data-ship-id="${shipId}"]`
+    );
+    buttons.forEach((cell) => {
+      cell.style.opacity = '1';
+    });
   },
   handleDragOver(event) {
     event.preventDefault(); // Allow dropping
