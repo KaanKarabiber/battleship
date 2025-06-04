@@ -25,3 +25,4 @@ import createUI from './createUI.js';
 const game = new Game();
 game.startGame(game, 'xd');
 createUI.createDragGrid();
+createUI.disableButtons();

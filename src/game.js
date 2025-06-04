@@ -103,5 +103,6 @@ export class Game {
     game.player2.placeShipsRandomly();
     createUI.renderShips(game);
     createUI.createDragGrid();
+    createUI.disableButtons();
   }
 }
