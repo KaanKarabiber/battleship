@@ -155,6 +155,8 @@ const createUI = {
     content.append(buttonDivs);
   },
   createDragGrid() {
+    if (document.querySelector('.drag-grid'))
+      document.querySelector('.drag-grid').remove();
     const content = document.querySelector('.content');
     const dragGrid = document.createElement('div');
     dragGrid.classList.add('drag-grid');

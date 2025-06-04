@@ -102,5 +102,6 @@ export class Game {
     game.player2.gameboard.resetBoard();
     game.player2.placeShipsRandomly();
     createUI.renderShips(game);
+    createUI.createDragGrid();
   }
 }
