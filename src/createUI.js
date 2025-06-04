@@ -115,6 +115,8 @@ const createUI = {
     restartButton.textContent = 'RESTART';
     restartButton.addEventListener('click', () => {
       game.restartGame(game);
+      if (document.querySelector('.start-game-button'))
+        document.querySelector('.start-game-button').remove();
     });
     const randomizeButton = document.createElement('button');
     randomizeButton.textContent = 'RANDOMIZE';
@@ -128,6 +130,7 @@ const createUI = {
         ship.classList.remove('draggable-ship');
         ship.draggable = false;
       });
+      this.addStartGameButton();
     });
     const orientationButton = document.createElement('button');
     orientationButton.textContent = 'Vertical';
@@ -158,6 +161,22 @@ const createUI = {
     buttonDivs.append(restartButton, randomizeButton, orientationButton);
     const content = document.querySelector('.content');
     content.append(buttonDivs);
+  },
+  addStartGameButton(player) {
+    const startGame = document.createElement('button');
+    startGame.classList.add('start-game-button');
+    startGame.textContent = 'Start Game';
+
+    const content = document.querySelector('.content');
+
+    if (!player || player?.areAllShipsPlaced()) {
+      content.append(startGame);
+    }
+
+    startGame.addEventListener('click', () => {
+      this.enableButtons();
+      startGame.remove();
+    });
   },
   createDragGrid() {
     if (document.querySelector('.drag-grid'))
@@ -414,6 +433,7 @@ const createUI = {
     }
     player.gameboard.placeShip(coordinates);
     createUI.handleDragLeave(event);
+    this.addStartGameButton(player);
     currentDraggedShipId = null;
   },
 };
