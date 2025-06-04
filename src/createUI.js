@@ -123,6 +123,11 @@ const createUI = {
       game.player1.gameboard.resetBoard();
       game.player1.placeShipsRandomly();
       this.renderShips(game);
+      let draggableShips = document.querySelectorAll('.draggable-ship');
+      draggableShips.forEach((ship) => {
+        ship.classList.remove('draggable-ship');
+        ship.draggable = false;
+      });
     });
     const orientationButton = document.createElement('button');
     orientationButton.textContent = 'Vertical';
