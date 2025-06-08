@@ -84,7 +84,6 @@ export class Game {
     const boards = createUI.createDivs();
     createUI.createBoard(boards[0], game.player1, game);
     createUI.createBoard(boards[1], game.player2, game);
-    createUI.renderShips(game);
     createUI.addUtilityButtons(game);
   }
   restartGame(game) {
@@ -101,7 +100,6 @@ export class Game {
     game.player1.gameboard.resetBoard();
     game.player2.gameboard.resetBoard();
     game.player2.placeShipsRandomly();
-    createUI.renderShips(game);
     createUI.createDragGrid();
     createUI.disableButtons();
   }
