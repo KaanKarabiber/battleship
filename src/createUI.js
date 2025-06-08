@@ -117,6 +117,12 @@ const createUI = {
       game.restartGame(game);
       if (document.querySelector('.start-game-button'))
         document.querySelector('.start-game-button').remove();
+      document.querySelectorAll('#player-1-grid .grid-cell').forEach((cell) => {
+        cell.removeAttribute('data-ship-id');
+        cell.removeAttribute('data-orientation');
+        cell.removeAttribute('draggable');
+        cell.style.removeProperty('opacity');
+      });
     });
     const randomizeButton = document.createElement('button');
     randomizeButton.textContent = 'RANDOMIZE';
@@ -130,7 +136,9 @@ const createUI = {
         ship.classList.remove('draggable-ship');
         ship.draggable = false;
       });
+      this.addDragToPlayerBoardShips();
       this.addStartGameButton();
+      console.log(document.querySelectorAll('.ship').length); // Should log 17
     });
     const orientationButton = document.createElement('button');
     orientationButton.textContent = 'Vertical';
@@ -144,10 +152,10 @@ const createUI = {
       orientationButton.textContent =
         newOrientation.charAt(0).toUpperCase() + newOrientation.slice(1);
 
-      const allShipCells = document.querySelectorAll(
-        '.drag-grid .draggable-ship'
-      );
-
+      const allShipCells = [
+        ...document.querySelectorAll('.drag-grid .draggable-ship'),
+        ...document.querySelectorAll('.grid-cell.ship'),
+      ];
       allShipCells.forEach((cell) => {
         cell.dataset.orientation = newOrientation;
       });
@@ -343,7 +351,7 @@ const createUI = {
   handleDrop(event, player) {
     event.preventDefault();
     let coordinates = [];
-
+    let changePositionOnBoard = false;
     const dataString = event.dataTransfer.getData('text/plain');
     let shipId, orientation;
 
@@ -400,7 +408,24 @@ const createUI = {
       createUI.handleDragLeave();
       return;
     }
+    const oldShipCells = document.querySelectorAll(
+      `.grid-cell.ship[data-ship-id="${shipId}"]`
+    );
+    let oldCoordinates = [];
+    oldShipCells.forEach((cell) => {
+      cell.classList.remove('ship');
+      cell.removeAttribute('data-ship-id');
+      cell.removeAttribute('data-orientation');
+      cell.removeAttribute('draggable');
+      cell.style.removeProperty('opacity');
+      changePositionOnBoard = true;
 
+      oldCoordinates.push([
+        parseInt(cell.dataset.row),
+        parseInt(cell.dataset.col),
+      ]);
+    });
+    player.gameboard.removeShip(oldCoordinates);
     for (let i = 0; i < shipLength; i++) {
       let currentRow = orientation === 'vertical' ? row - i : row;
       let currentCol = orientation === 'horizontal' ? col + i : col;
@@ -410,6 +435,8 @@ const createUI = {
       );
       if (cell) {
         cell.classList.add('ship');
+        cell.dataset.shipId = shipId;
+        cell.dataset.orientation = orientation;
         coordinates.push([currentRow, currentCol]);
       }
     }
@@ -433,8 +460,17 @@ const createUI = {
     }
     player.gameboard.placeShip(coordinates);
     createUI.handleDragLeave(event);
-    this.addStartGameButton(player);
+    console.log(!changePositionOnBoard);
+    if (!changePositionOnBoard) this.addStartGameButton(player);
     currentDraggedShipId = null;
+    this.addDragToPlayerBoardShips();
+  },
+  addDragToPlayerBoardShips() {
+    document.querySelectorAll('.ship').forEach((ship) => {
+      ship.setAttribute('draggable', 'true');
+      ship.addEventListener('dragstart', createUI.handleDragStart);
+      ship.addEventListener('dragend', createUI.handleDragEnd);
+    });
   },
 };
 export default createUI;
