@@ -17,6 +17,31 @@ export class Gameboard {
     this.ships.push(ship);
     return ship;
   }
+  removeShip(coordinates) {
+    if (!coordinates || coordinates.length === 0) return false;
+
+    // Get the ship instance at the first coordinate
+    const [x0, y0] = coordinates[0];
+    const shipToRemove = this.board[x0][y0];
+
+    if (!(shipToRemove instanceof Ship)) {
+      // No ship found at this position
+      return false;
+    }
+
+    // Remove ship from the ships array
+    this.ships = this.ships.filter((ship) => ship !== shipToRemove);
+
+    // Remove ship from board cells
+    coordinates.forEach(([x, y]) => {
+      if (this.board[x][y] === shipToRemove) {
+        this.board[x][y] = null;
+      }
+    });
+
+    return true; // indicate success
+  }
+
   isValidPlacement(coordinates) {
     return coordinates.every(
       ([x, y]) =>
