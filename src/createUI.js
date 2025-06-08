@@ -143,7 +143,7 @@ const createUI = {
       let draggableShips = document.querySelectorAll('.draggable-ship');
       draggableShips.forEach((ship) => {
         ship.classList.remove('draggable-ship');
-        ship.draggable = false;
+        ship.removeAttribute('draggable');
       });
       this.addDragToPlayerBoardShips();
       this.addStartGameButton();
@@ -191,6 +191,9 @@ const createUI = {
 
     startGame.addEventListener('click', () => {
       this.enableButtons();
+      document.querySelectorAll('#player-1-grid .grid-cell').forEach((cell) => {
+        cell.removeAttribute('draggable');
+      });
       startGame.remove();
     });
   },
