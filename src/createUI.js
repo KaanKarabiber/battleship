@@ -138,7 +138,6 @@ const createUI = {
       });
       this.addDragToPlayerBoardShips();
       this.addStartGameButton();
-      console.log(document.querySelectorAll('.ship').length); // Should log 17
     });
     const orientationButton = document.createElement('button');
     orientationButton.textContent = 'Vertical';
@@ -460,7 +459,6 @@ const createUI = {
     }
     player.gameboard.placeShip(coordinates);
     createUI.handleDragLeave(event);
-    console.log(!changePositionOnBoard);
     if (!changePositionOnBoard) this.addStartGameButton(player);
     currentDraggedShipId = null;
     this.addDragToPlayerBoardShips();
