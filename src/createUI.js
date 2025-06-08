@@ -85,17 +85,23 @@ const createUI = {
       cell.classList.add('miss');
     }
   },
-  renderShips(game) {
-    document.querySelectorAll('.ship').forEach((element) => {
-      element.classList.remove('ship');
+  addShipDataAttributes(ships) {
+    const shipCells = document.querySelectorAll('#player-1-grid .ship');
+    shipCells.forEach((cell) => {
+      delete cell.dataset.shipId;
+      delete cell.dataset.orientation;
+      cell.classList.remove('ship');
+      cell.removeAttribute('draggable');
     });
-    game.player1.gameboard.board.forEach((row, rowIndex) => {
-      row.forEach((cell, colIndex) => {
-        if (cell != null) {
-          const shipPart = document.querySelector(
-            `[data-row="${rowIndex}"][data-col="${colIndex}"]`
-          );
-          shipPart.classList.add('ship');
+    ships.forEach((ship) => {
+      ship.coordinates.forEach(([x, y]) => {
+        const cell = document.querySelector(
+          `[data-row="${x}"][data-col="${y}"]`
+        );
+        if (cell) {
+          cell.dataset.shipId = ship.id;
+          cell.dataset.orientation = ship.orientation;
+          cell.classList.add('ship');
         }
       });
     });
@@ -109,14 +115,16 @@ const createUI = {
     );
     if (shot) cell.classList.add(shot.hit ? 'hit' : 'miss');
   },
-  // add a logic to disable randomize if a game started
+  removeStartGameButton() {
+    if (document.querySelector('.start-game-button'))
+      document.querySelector('.start-game-button').remove();
+  },
   addUtilityButtons(game) {
     const restartButton = document.createElement('button');
     restartButton.textContent = 'RESTART';
     restartButton.addEventListener('click', () => {
       game.restartGame(game);
-      if (document.querySelector('.start-game-button'))
-        document.querySelector('.start-game-button').remove();
+      this.removeStartGameButton();
       document.querySelectorAll('#player-1-grid .grid-cell').forEach((cell) => {
         cell.removeAttribute('data-ship-id');
         cell.removeAttribute('data-orientation');
@@ -129,8 +137,9 @@ const createUI = {
 
     randomizeButton.addEventListener('click', () => {
       game.player1.gameboard.resetBoard();
+      this.removeStartGameButton();
       game.player1.placeShipsRandomly();
-      this.renderShips(game);
+      this.addShipDataAttributes(game.player1.gameboard.ships);
       let draggableShips = document.querySelectorAll('.draggable-ship');
       draggableShips.forEach((ship) => {
         ship.classList.remove('draggable-ship');
@@ -457,7 +466,7 @@ const createUI = {
         }
       });
     }
-    player.gameboard.placeShip(coordinates);
+    player.gameboard.placeShip(coordinates, shipId, orientation);
     createUI.handleDragLeave(event);
     if (!changePositionOnBoard) this.addStartGameButton(player);
     currentDraggedShipId = null;
