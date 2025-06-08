@@ -13,13 +13,15 @@ export class Player {
   setOpponent(opponent) {
     this.opponent = opponent;
   }
-  placeShip(coordinates) {
-    return this.gameboard.placeShip(coordinates);
+  placeShip(coordinates, id, orientation) {
+    return this.gameboard.placeShip(coordinates, id, orientation);
   }
   placeShipsRandomly() {
-    this.shipLengths.forEach((length) => {
-      const coordinates = this.generateRandomCoordinates(length);
-      this.placeShip(coordinates);
+    this.shipLengths.forEach((length, index) => {
+      const isHorizontal = Math.random() < 0.5; // Randomly decide direction
+      const orientation = isHorizontal ? 'horizontal' : 'vertical';
+      const coordinates = this.generateRandomCoordinates(length, isHorizontal);
+      this.placeShip(coordinates, `ship-${index}`, orientation);
     });
   }
   attack([x, y]) {
@@ -33,9 +35,8 @@ export class Player {
   areAllShipsPlaced() {
     return this.gameboard.ships.length === this.shipLengths.length;
   }
-  generateRandomCoordinates(length) {
+  generateRandomCoordinates(length, isHorizontal) {
     let coordinates;
-    const isHorizontal = Math.random() < 0.5; // Randomly decide direction
     let x, y;
 
     do {
