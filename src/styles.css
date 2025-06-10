@@ -3,16 +3,26 @@
   padding: 0;
   box-sizing: border-box;
 }
+:root {
+  --bg-main: #0d1b2a;
+  --color-water: #00a8e8;
+  --color-accent: #39ff14;
+  --color-hit: #ff4500;
+  --color-miss: #4d648d;
+  --color-ship: #a1887f;
+  --text-main: #eaeaea;
+}
 html,
 body {
   height: 100%;
   width: 100%;
+  background-color: var(--bg-main);
 }
 header {
   width: 100%;
   height: 60px;
   background-color: #333;
-  color: white;
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,34 +83,59 @@ input {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
+  background-image: linear-gradient(to bottom, var(--color-water), #081ee7);
+  background-repeat: no-repeat;
 }
 .grid-cell {
   width: 50px;
   height: 50px;
+  background-color: transparent;
+  border: 1px solid #0519ce3b;
+  /* border-color: #0519ce3b; */
 }
 .grid-cell.ship {
-  background-color: gray;
+  background: var(--color-ship);
 }
 .grid-cell.miss {
-  background-color: blue;
+  background: var(--color-miss);
 }
 .grid-cell.hit {
-  background-color: red;
+  background: var(--color-hit);
 }
 .drag-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(10, 1fr);
+  background-image: linear-gradient(to bottom, var(--color-water), #081ee7);
+  background-repeat: no-repeat;
 }
 
 .drag-cells {
   width: 50px;
   height: 50px;
-  /* border: none; */
+  background-color: transparent;
+  border: 1px solid #0519ce3b;
 }
 .draggable-ship {
-  background-color: gray;
+  background-color: var(--color-ship);
 }
 .grid-cell.highlight {
   border: 3px dashed rgba(0, 0, 0, 0.5);
+}
+.start-game-button {
+  background: transparent;
+  border: none;
+  font-size: 0;
+  color: transparent;
+  cursor: pointer;
+  width: 25px;
+  height: 50px;
+  border-style: solid;
+  border-color: var(--color-accent);
+  border-width: 0 10px 10px 0;
+  transform: rotate(45deg);
+  transition: border-color 0.2s ease-in-out;
+}
+.start-game-button:hover {
+  border-color: #28a745; /* A slightly darker green on hover */
 }
