@@ -131,8 +131,10 @@ const createUI = {
         cell.removeAttribute('draggable');
         cell.style.removeProperty('opacity');
       });
+      document.querySelector('.randomize-button').disabled = false;
     });
     const randomizeButton = document.createElement('button');
+    randomizeButton.classList.add('randomize-button');
     randomizeButton.textContent = 'RANDOMIZE';
 
     randomizeButton.addEventListener('click', () => {
@@ -181,7 +183,6 @@ const createUI = {
   addStartGameButton(player) {
     const startGame = document.createElement('button');
     startGame.classList.add('start-game-button');
-    startGame.textContent = 'Start Game';
 
     const content = document.querySelector('.content');
 
@@ -194,6 +195,7 @@ const createUI = {
       document.querySelectorAll('#player-1-grid .grid-cell').forEach((cell) => {
         cell.removeAttribute('draggable');
       });
+      document.querySelector('.randomize-button').disabled = true;
       startGame.remove();
     });
   },
@@ -461,9 +463,13 @@ const createUI = {
     );
     if (dragShipElement) {
       dragShipElement.forEach((element) => {
+        // this removes all other classes except drag-cells
+        element.className = 'drag-cells';
+
         for (let i = element.attributes.length - 1; i >= 0; i--) {
           const attr = element.attributes[i];
-          if (attr.name !== 'drag-cell') {
+
+          if (attr.name !== 'class') {
             element.removeAttribute(attr.name);
           }
         }
