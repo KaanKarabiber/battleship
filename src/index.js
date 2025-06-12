@@ -23,6 +23,6 @@ import createUI from './createUI.js';
 // });
 
 const game = new Game();
-game.startGame(game, 'xd');
+game.startGame(game, 'Player 1');
 createUI.createDragGrid();
 createUI.disableButtons();
