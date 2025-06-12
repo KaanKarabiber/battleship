@@ -16,4 +16,4 @@ A classic Battleship game implemented for the browser, where you play against th
 - Webpack: Bundling modules for development and production.
 - ESLint: Code quality and consistency.
 
-Prewiew: https://kaankarabiber.github.io/battleship/
+Preview: https://kaankarabiber.github.io/battleship/
