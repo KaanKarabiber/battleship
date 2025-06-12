@@ -2,6 +2,18 @@ let currentDraggedShipId = null;
 let currentDragOrientation = 'vertical';
 const createUI = {
   createDivs() {
+    const gridWrapper = document.createElement('div');
+    gridWrapper.classList.add('grid-wrapper');
+
+    const boardWrapperPlayer = document.createElement('div');
+    boardWrapperPlayer.classList.add('board-wrapper', 'player-board-div');
+
+    const boardWrapperComputer = document.createElement('div');
+    boardWrapperComputer.classList.add('board-wrapper', 'computer-board-div');
+
+    const buttonDivs = document.createElement('div');
+    buttonDivs.classList.add('utility-button-div');
+
     const player1Grid = document.createElement('div');
     player1Grid.classList.add('board');
     player1Grid.id = 'player-1-grid';
@@ -10,8 +22,14 @@ const createUI = {
     player2Grid.classList.add('board');
     player2Grid.id = 'player-2-grid';
 
+    const dragWrapper = document.createElement('div');
+    dragWrapper.classList.add('drag-wrapper');
+
     const content = document.querySelector('.content');
-    content.append(player1Grid, player2Grid);
+    boardWrapperPlayer.append(player1Grid);
+    boardWrapperComputer.append(player2Grid);
+    gridWrapper.append(boardWrapperPlayer, boardWrapperComputer);
+    content.append(dragWrapper, gridWrapper, buttonDivs);
     return [player1Grid, player2Grid];
   },
 
@@ -130,7 +148,7 @@ const createUI = {
   addUtilityButtons(game) {
     const restartButton = document.createElement('button');
     restartButton.textContent = 'RESTART';
-    restartButton.classList.add('utility-button');
+    restartButton.classList.add('utility-button', 'wrapped-button');
     restartButton.addEventListener('click', () => {
       game.restartGame(game);
       this.removeStartGameButton();
@@ -142,11 +160,15 @@ const createUI = {
         cell.style.removeProperty('opacity');
       });
       randomizeButton.disabled = false;
-      orientationButton.textContent = 'Vertical';
+      orientationButton.textContent = 'VERTICAL';
       orientationButton.disabled = false;
     });
     const randomizeButton = document.createElement('button');
-    randomizeButton.classList.add('randomize-button', 'utility-button');
+    randomizeButton.classList.add(
+      'randomize-button',
+      'utility-button',
+      'wrapped-button'
+    );
     randomizeButton.textContent = 'RANDOMIZE';
 
     randomizeButton.addEventListener('click', () => {
@@ -163,18 +185,16 @@ const createUI = {
       this.addStartGameButton();
     });
     const orientationButton = document.createElement('button');
-    orientationButton.textContent = 'Vertical';
+    orientationButton.textContent = 'VERTICAL';
     orientationButton.classList.add('orientation-button', 'utility-button');
     orientationButton.addEventListener('click', () => {
       const newOrientation =
-        orientationButton.textContent === 'Vertical'
+        orientationButton.textContent === 'VERTICAL'
           ? 'horizontal'
           : 'vertical';
 
       // Update the button label
-      orientationButton.textContent =
-        newOrientation.charAt(0).toUpperCase() + newOrientation.slice(1);
-
+      orientationButton.textContent = newOrientation.toUpperCase();
       const allShipCells = [
         ...document.querySelectorAll('.drag-grid .draggable-ship'),
         ...document.querySelectorAll('.grid-cell.ship'),
@@ -187,20 +207,20 @@ const createUI = {
 
       console.log(`All ships set to ${newOrientation}`);
     });
+    const buttonDiv = document.querySelector('.utility-button-div');
+    const dragDiv = document.querySelector('.drag-wrapper');
 
-    const buttonDivs = document.createElement('div');
-    buttonDivs.append(restartButton, randomizeButton, orientationButton);
-    const content = document.querySelector('.content');
-    content.append(buttonDivs);
+    buttonDiv.append(randomizeButton, restartButton);
+    dragDiv.append(orientationButton);
   },
   addStartGameButton(player) {
     const startGame = document.createElement('button');
     startGame.classList.add('start-game-button');
 
-    const content = document.querySelector('.content');
-
+    const gridWrapper = document.querySelector('.grid-wrapper');
+    const secondChild = gridWrapper.children[1];
     if (!player || player?.areAllShipsPlaced()) {
-      content.append(startGame);
+      gridWrapper.insertBefore(startGame, secondChild); // adds in the middle
     }
 
     startGame.addEventListener('click', () => {
@@ -217,8 +237,6 @@ const createUI = {
   addShipsRemainingDisplay() {
     if (document.querySelector('.ships-remaining')) return;
 
-    const content = document.querySelector('.content');
-
     const player1Text = document.createElement('div');
     player1Text.classList.add('ships-player1', 'ships-remaining');
     player1Text.textContent = 'Player 1 Ships Remaining: 5';
@@ -227,7 +245,10 @@ const createUI = {
     player2Text.classList.add('ships-player2', 'ships-remaining');
     player2Text.textContent = 'Player 2 Ships Remaining: 5';
 
-    content.append(player1Text, player2Text);
+    const playerBoardDiv = document.querySelector('.player-board-div');
+    const computerBoardDiv = document.querySelector('.computer-board-div');
+    playerBoardDiv.append(player1Text);
+    computerBoardDiv.append(player2Text);
   },
   updateShipsRemaining(game) {
     const p1Ships = game.player1.gameboard.ships.filter(
@@ -236,7 +257,6 @@ const createUI = {
     const p2Ships = game.player2.gameboard.ships.filter(
       (ship) => !ship.isSunk()
     ).length;
-    console.log(game.player1.gameboard.ships);
     const player1Text = document.querySelector('.ships-player1');
     const player2Text = document.querySelector('.ships-player2');
 
@@ -249,6 +269,7 @@ const createUI = {
     if (document.querySelector('.drag-grid'))
       document.querySelector('.drag-grid').remove();
     const content = document.querySelector('.content');
+    const dragWrapper = document.querySelector('.drag-wrapper');
     const dragGrid = document.createElement('div');
     dragGrid.classList.add('drag-grid');
 
@@ -326,7 +347,8 @@ const createUI = {
         dragGrid.append(cell);
       }
     }
-    content.prepend(dragGrid);
+    dragWrapper.append(dragGrid);
+    content.prepend(dragWrapper);
   },
   handleDragStart(event) {
     // hide dragged cell
