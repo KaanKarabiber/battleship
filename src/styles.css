@@ -2,6 +2,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 2px;
 }
 :root {
   --bg-main: #0d1b2a;
@@ -17,6 +19,7 @@ body {
   height: 100%;
   width: 100%;
   background-color: var(--bg-main);
+  /* font-family: 'Orbitron', sans-serif; */
 }
 header {
   width: 100%;
@@ -78,6 +81,34 @@ input {
   align-items: center;
   width: 100%;
   height: calc(100vh - 60px);
+  gap: 1rem;
+}
+.drag-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 725px;
+}
+.grid-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.board-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 600px;
+  gap: 1rem;
+}
+.player-board-div,
+.computer-board-div {
+  min-height: 600px;
+}
+.utility-button-div {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 .board {
   display: grid;
@@ -85,6 +116,7 @@ input {
   grid-template-rows: repeat(10, 1fr);
   background-image: linear-gradient(to bottom, var(--color-water), #081ee7);
   background-repeat: no-repeat;
+  border: 3px solid black;
 }
 .grid-cell {
   width: 50px;
@@ -119,6 +151,7 @@ input {
   grid-template-rows: repeat(10, 1fr);
   background-image: linear-gradient(to bottom, var(--color-water), #081ee7);
   background-repeat: no-repeat;
+  border: 3px solid black;
 }
 
 .drag-cells {
@@ -134,6 +167,7 @@ input {
   border: 2px dashed rgba(0, 0, 0, 0.5);
 }
 .start-game-button {
+  flex-shrink: 0;
   background: transparent;
   border: none;
   font-size: 0;
@@ -144,7 +178,7 @@ input {
   border-style: solid;
   border-color: var(--color-accent);
   border-width: 0 10px 10px 0;
-  transform: rotate(45deg);
+  transform: rotate(45deg) scale(1.5);
   transition: border-color 0.2s ease-in-out;
 }
 .start-game-button:hover {
@@ -155,16 +189,22 @@ input {
 }
 .utility-button {
   background: #2b2d42;
-  color: white;
+  color: var(--text-main);
   border: none;
-  padding: 10px 15px;
+  padding: 10px;
   margin: 5px;
   border-radius: 8px;
   font-weight: bold;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.9);
   transition: background 0.3s ease;
 }
 
 .utility-button:hover {
   background: #8d99ae;
+}
+.wrapped-button {
+  font-size: larger;
+  border-radius: 1rem;
+  height: 80px;
+  width: 200px;
 }
