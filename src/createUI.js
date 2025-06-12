@@ -130,6 +130,7 @@ const createUI = {
   addUtilityButtons(game) {
     const restartButton = document.createElement('button');
     restartButton.textContent = 'RESTART';
+    restartButton.classList.add('utility-button');
     restartButton.addEventListener('click', () => {
       game.restartGame(game);
       this.removeStartGameButton();
@@ -145,7 +146,7 @@ const createUI = {
       orientationButton.disabled = false;
     });
     const randomizeButton = document.createElement('button');
-    randomizeButton.classList.add('randomize-button');
+    randomizeButton.classList.add('randomize-button', 'utility-button');
     randomizeButton.textContent = 'RANDOMIZE';
 
     randomizeButton.addEventListener('click', () => {
@@ -163,7 +164,7 @@ const createUI = {
     });
     const orientationButton = document.createElement('button');
     orientationButton.textContent = 'Vertical';
-    orientationButton.classList.add('orientation-button');
+    orientationButton.classList.add('orientation-button', 'utility-button');
     orientationButton.addEventListener('click', () => {
       const newOrientation =
         orientationButton.textContent === 'Vertical'
@@ -235,7 +236,7 @@ const createUI = {
     const p2Ships = game.player2.gameboard.ships.filter(
       (ship) => !ship.isSunk()
     ).length;
-
+    console.log(game.player1.gameboard.ships);
     const player1Text = document.querySelector('.ships-player1');
     const player2Text = document.querySelector('.ships-player2');
 
@@ -328,6 +329,11 @@ const createUI = {
     content.prepend(dragGrid);
   },
   handleDragStart(event) {
+    // hide dragged cell
+    const img = new Image();
+    img.src =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/58HAokBAtgDTF8AAAAASUVORK5CYII='; // 1x1 transparent pixel
+    event.dataTransfer.setDragImage(img, 0, 0);
     const shipId = event.target.dataset.shipId;
 
     const buttons = document.querySelectorAll(
