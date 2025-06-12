@@ -85,7 +85,9 @@ const createUI = {
             }
 
             await game.playTurn([row, col]);
-            if (!game.isGameOver()) createUI.enableButtons();
+            if (game.isGameOver())
+              this.showGameOverMessage(game.currentPlayer.name);
+            else createUI.enableButtons();
           });
         }
       });
@@ -153,6 +155,7 @@ const createUI = {
       game.restartGame(game);
       this.removeStartGameButton();
       this.removeShipsRemaining();
+      this.removeExistingMessage();
       document.querySelectorAll('#player-1-grid .grid-cell').forEach((cell) => {
         cell.removeAttribute('data-ship-id');
         cell.removeAttribute('data-orientation');
@@ -263,7 +266,7 @@ const createUI = {
     if (player1Text)
       player1Text.textContent = `Player 1 Ships Remaining: ${p1Ships}`;
     if (player2Text)
-      player2Text.textContent = `Player 2 Ships Remaining: ${p2Ships}`;
+      player2Text.textContent = `Computer Ships Remaining: ${p2Ships}`;
   },
   createDragGrid() {
     if (document.querySelector('.drag-grid'))
@@ -560,6 +563,19 @@ const createUI = {
       ship.addEventListener('dragstart', createUI.handleDragStart);
       ship.addEventListener('dragend', createUI.handleDragEnd);
     });
+  },
+  showGameOverMessage(winnerName) {
+    this.removeExistingMessage();
+
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('game-over-message');
+    messageDiv.textContent = `${winnerName} has won the game!`;
+
+    document.body.appendChild(messageDiv);
+  },
+  removeExistingMessage() {
+    const existingMessage = document.querySelector('.game-over-message');
+    if (existingMessage) existingMessage.remove();
   },
 };
 export default createUI;
