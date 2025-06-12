@@ -22,6 +22,7 @@ export class Game {
 
   async playTurn(coordinates) {
     this.currentPlayer.attack(coordinates);
+    createUI.updateShipsRemaining(this);
     const [x, y] = coordinates;
     const playerShot = this.currentPlayer.opponent.gameboard.receivedShots.find(
       (s) => s.coordinates[0] === x && s.coordinates[1] === y
@@ -47,6 +48,7 @@ export class Game {
 
         do {
           compCoordinates = this.currentPlayer.attack();
+          createUI.updateShipsRemaining(this);
 
           if (this.isGameOver()) {
             createUI.addClass(compCoordinates, this.player1);

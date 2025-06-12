@@ -139,3 +139,6 @@ input {
 .start-game-button:hover {
   border-color: #28a745; /* A slightly darker green on hover */
 }
+.ships-remaining {
+  color: var(--text-main);
+}

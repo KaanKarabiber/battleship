@@ -119,19 +119,30 @@ const createUI = {
     if (document.querySelector('.start-game-button'))
       document.querySelector('.start-game-button').remove();
   },
+  removeShipsRemaining() {
+    let shipsCountDisplays = document.querySelectorAll('.ships-remaining');
+    if (shipsCountDisplays) {
+      shipsCountDisplays.forEach((display) => {
+        display.remove();
+      });
+    }
+  },
   addUtilityButtons(game) {
     const restartButton = document.createElement('button');
     restartButton.textContent = 'RESTART';
     restartButton.addEventListener('click', () => {
       game.restartGame(game);
       this.removeStartGameButton();
+      this.removeShipsRemaining();
       document.querySelectorAll('#player-1-grid .grid-cell').forEach((cell) => {
         cell.removeAttribute('data-ship-id');
         cell.removeAttribute('data-orientation');
         cell.removeAttribute('draggable');
         cell.style.removeProperty('opacity');
       });
-      document.querySelector('.randomize-button').disabled = false;
+      randomizeButton.disabled = false;
+      orientationButton.textContent = 'Vertical';
+      orientationButton.disabled = false;
     });
     const randomizeButton = document.createElement('button');
     randomizeButton.classList.add('randomize-button');
@@ -152,6 +163,7 @@ const createUI = {
     });
     const orientationButton = document.createElement('button');
     orientationButton.textContent = 'Vertical';
+    orientationButton.classList.add('orientation-button');
     orientationButton.addEventListener('click', () => {
       const newOrientation =
         orientationButton.textContent === 'Vertical'
@@ -196,8 +208,41 @@ const createUI = {
         cell.removeAttribute('draggable');
       });
       document.querySelector('.randomize-button').disabled = true;
+      document.querySelector('.orientation-button').disabled = true;
+      this.addShipsRemainingDisplay();
       startGame.remove();
     });
+  },
+  addShipsRemainingDisplay() {
+    if (document.querySelector('.ships-remaining')) return;
+
+    const content = document.querySelector('.content');
+
+    const player1Text = document.createElement('div');
+    player1Text.classList.add('ships-player1', 'ships-remaining');
+    player1Text.textContent = 'Player 1 Ships Remaining: 5';
+
+    const player2Text = document.createElement('div');
+    player2Text.classList.add('ships-player2', 'ships-remaining');
+    player2Text.textContent = 'Player 2 Ships Remaining: 5';
+
+    content.append(player1Text, player2Text);
+  },
+  updateShipsRemaining(game) {
+    const p1Ships = game.player1.gameboard.ships.filter(
+      (ship) => !ship.isSunk()
+    ).length;
+    const p2Ships = game.player2.gameboard.ships.filter(
+      (ship) => !ship.isSunk()
+    ).length;
+
+    const player1Text = document.querySelector('.ships-player1');
+    const player2Text = document.querySelector('.ships-player2');
+
+    if (player1Text)
+      player1Text.textContent = `Player 1 Ships Remaining: ${p1Ships}`;
+    if (player2Text)
+      player2Text.textContent = `Player 2 Ships Remaining: ${p2Ships}`;
   },
   createDragGrid() {
     if (document.querySelector('.drag-grid'))
